@@ -16,12 +16,20 @@ def detect_hazards(image_path):
     Detect construction-site hazards in an image.
     """
 
-    results = model.predict(
-        source=image_path,
-        conf=0.25,
-        device=0,
-        verbose=False
-    )
+    # Automatically choose device (CUDA if available, else CPU)
+    try:
+        results = model.predict(
+            source=image_path,
+            conf=0.25,
+            verbose=False
+        )
+    except Exception:
+        results = model.predict(
+            source=image_path,
+            conf=0.25,
+            device="cpu",
+            verbose=False
+        )
 
     detections = []
 

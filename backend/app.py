@@ -3,6 +3,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from detector import detect_hazards
 from risk_engine import calculate_risk
+from safety_agent import analyze_safety
 
 import os
 import cv2
@@ -26,7 +27,40 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 @app.route("/api/health")
 def health():
     return jsonify({
-        "status": "GUARDEX API is running"
+        "status": "BuildSure AI API is running",
+        "agent_network": "Active",
+        "agents": ["Site Risk Agent", "Safety Agent", "Compliance Agent", "Risk Intelligence Engine"]
+    })
+
+
+@app.route("/api/demo-telemetry", methods=["GET"])
+def demo_telemetry():
+    """Returns sample pre-computed multi-agent telemetry for instant live preview."""
+    sample_detections = [
+        {"class": "NO-Hardhat", "confidence": 0.942, "bbox": [180, 84, 260, 210], "frame": 12, "time_seconds": 0.48, "zone": "Zone A — High Rise Deck"},
+        {"class": "Person", "confidence": 0.965, "bbox": [170, 80, 310, 480], "frame": 12, "time_seconds": 0.48, "zone": "Zone A — High Rise Deck"},
+        {"class": "NO-Safety Vest", "confidence": 0.887, "bbox": [190, 190, 305, 360], "frame": 12, "time_seconds": 0.48, "zone": "Zone A — High Rise Deck"},
+        {"class": "machinery", "confidence": 0.912, "bbox": [420, 240, 720, 540], "frame": 36, "time_seconds": 1.44, "zone": "Zone C — Excavation Pit"},
+        {"class": "Person", "confidence": 0.951, "bbox": [530, 280, 610, 510], "frame": 36, "time_seconds": 1.44, "zone": "Zone C — Excavation Pit"},
+        {"class": "Hardhat", "confidence": 0.938, "bbox": [545, 280, 595, 330], "frame": 36, "time_seconds": 1.44, "zone": "Zone C — Excavation Pit"},
+        {"class": "Safety Vest", "confidence": 0.925, "bbox": [535, 330, 605, 420], "frame": 36, "time_seconds": 1.44, "zone": "Zone C — Excavation Pit"},
+        {"class": "vehicle", "confidence": 0.874, "bbox": [50, 310, 290, 580], "frame": 60, "time_seconds": 2.40, "zone": "Zone B — Haul Road"},
+        {"class": "Safety Cone", "confidence": 0.899, "bbox": [320, 460, 380, 540], "frame": 60, "time_seconds": 2.40, "zone": "Zone B — Perimeter"}
+    ]
+    risk = calculate_risk(sample_detections)
+    safety = analyze_safety(sample_detections)
+    return jsonify({
+        "success": True,
+        "type": "demo",
+        "video": {
+            "filename": "Hudson_Yards_NorthGate_CAM04.mp4",
+            "total_frames": 240,
+            "fps": 25.0,
+            "duration_seconds": 9.6
+        },
+        "detections": sample_detections,
+        "risk": risk,
+        "safety": safety
     })
 
 
@@ -63,12 +97,16 @@ def analyze_image():
 
     # Risk calculation
     risk = calculate_risk(detections)
+    
+    # Safety calculation
+    safety = analyze_safety(detections)
 
     return jsonify({
         "success": True,
         "type": "image",
         "detections": detections,
-        "risk": risk
+        "risk": risk,
+        "safety": safety
     })
 
 
@@ -185,6 +223,9 @@ def analyze_video():
     risk = calculate_risk(
         all_detections
     )
+    
+    # Calculate safety metrics
+    safety = analyze_safety(all_detections)
 
     return jsonify({
 
@@ -204,7 +245,8 @@ def analyze_video():
 
         "detections": all_detections,
 
-        "risk": risk
+        "risk": risk,
+        "safety": safety
     })
 
 
