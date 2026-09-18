@@ -19,7 +19,13 @@ import {
   TrendingUp,
   TrendingDown,
   Circle,
-  X
+  X,
+  Scale,
+  ShieldCheck,
+  FileCheck,
+  Info,
+  Printer,
+  ExternalLink
 } from "lucide-react";
 
 import {
@@ -152,6 +158,76 @@ export default function App() {
             { type: "Unsecured Perimeter Access",  zone: "Zone A — Perimeter",   severity: "Medium" },
           ],
         },
+        compliance: {
+          compliance_score: 96,
+          compliance_status: "Action Required",
+          audit_readiness: 92,
+          violations_count: 2,
+          violations: [
+            {
+              rule_id: "RULE-PPE-01",
+              standard: "OSHA 29 CFR 1926.100",
+              title: "Head Protection",
+              category: "PPE Standard",
+              count: 1,
+              severity: "High",
+              description: "Employees working in areas where there is possible danger of head injury shall wear protective helmets.",
+              recommendation: "Require mandatory hardhat use before entering active work zones."
+            },
+            {
+              rule_id: "RULE-PPE-02",
+              standard: "OSHA 29 CFR 1926.28",
+              title: "Personal Protective Equipment",
+              category: "PPE Standard",
+              count: 1,
+              severity: "Medium",
+              description: "The employer is responsible for requiring appropriate PPE in hazardous operations.",
+              recommendation: "Issue and mandate high-visibility safety vests for all personnel."
+            }
+          ],
+          inspection_checkpoints: [
+            { checkpoint: "Head Protection (OSHA 29 CFR 1926.100)", status: "Non-Compliant", detail: "1 instance detected without helmet.", category: "PPE Standard" },
+            { checkpoint: "Hi-Vis Vest (OSHA 29 CFR 1926.28)", status: "Non-Compliant", detail: "1 instance detected without safety vest.", category: "PPE Standard" },
+            { checkpoint: "Respiratory Protection (OSHA 29 CFR 1926.95)", status: "Compliant", detail: "No non-compliance detected.", category: "PPE Standard" },
+            { checkpoint: "Heavy Machinery Safety Clearance", status: "Warning", detail: "Machinery operating with workers in zone.", category: "Equipment Safety" },
+            { checkpoint: "Safety Cones Demarcation", status: "Compliant", detail: "Perimeter cones detected in view.", category: "Site Controls" }
+          ],
+          category_scores: {
+            "OSHA Standards": 98,
+            "Building Codes": 95,
+            "Environmental Regulations": 94,
+            "Site Safety Rules": 91
+          },
+          recommendations: [
+            "Require mandatory hardhat use before entering active work zones.",
+            "Issue and mandate high-visibility safety vests for all personnel on deck and roadway zones.",
+            "Establish barricaded swing radius and assign dedicated ground spotters during machinery operation."
+          ],
+          limitation_note: "Rule evaluation is constrained to visual hazards and PPE classes detected by the current YOLOv11 model."
+        },
+        insurance: {
+          insurance_risk_score: 38,
+          risk_level: "Medium",
+          loss_control_rating: "Grade B (Standard Controls)",
+          premium_impact: "Standard Underwriting Tier (+0% to +5%)",
+          risk_factors: [
+            { line: "Workers' Compensation", driver: "Head Injury & Struck-By Exposure", severity: "High", impact: "Primary driver of severe worker indemnity and medical claims." },
+            { line: "Commercial General Liability (CGL)", driver: "Heavy Machinery & Pedestrian Proximity", severity: "Medium", impact: "Potential third-party vehicular damage or bystander incident." },
+            { line: "Site Liability & EHS", driver: "Low Visibility Personnel", severity: "Medium", impact: "Personnel without vests increase equipment accident probability." }
+          ],
+          loss_control_recommendations: [
+            "Enforce strict 100% hardhat and high-vis vest compliance at all zone entry turnstiles.",
+            "Implement designated machinery spotters and physical barricades around operating excavators.",
+            "Maintain logged pre-shift toolbox safety briefings to document proactive loss control.",
+            "Ensure prompt corrective action close-out for all computer-vision-flagged non-compliances."
+          ],
+          underwriting_profile: {
+            workers_comp_exposure: "Elevated",
+            cgl_exposure: "Moderate",
+            site_supervision_index: "92% Adherence"
+          },
+          disclaimer: "Notice: This assessment is an AI-assisted risk analytics estimation generated for proactive site safety and loss control engineering purposes only. It does not constitute an official insurance policy underwriting decision, formal audit certification, or legally binding rate quotation."
+        },
         detections: [
           { class: "NO-Hardhat",    confidence: 0.94, zone: "Zone A" },
           { class: "NO-Safety Vest",confidence: 0.89, zone: "Zone B" },
@@ -221,10 +297,77 @@ export default function App() {
     { class: "machinery",     confidence: 0.91, zone: "Zone C" },
   ];
 
+  // ── Milestone 3: Compliance & Insurance Derived values ────────────────────
+  const complianceScore = result?.compliance?.compliance_score ?? 96;
+  const complianceStatus = result?.compliance?.compliance_status ?? "Action Required";
+  const auditReadiness = result?.compliance?.audit_readiness ?? 92;
+  const complianceViolations = result?.compliance?.violations ?? [
+    {
+      rule_id: "RULE-PPE-01",
+      standard: "OSHA 29 CFR 1926.100",
+      title: "Head Protection",
+      category: "PPE Standard",
+      count: 1,
+      severity: "High",
+      description: "Worker detected without mandatory protective helmet.",
+      recommendation: "Require mandatory hardhat use before entering active work zones."
+    },
+    {
+      rule_id: "RULE-PPE-02",
+      standard: "OSHA 29 CFR 1926.28",
+      title: "Personal Protective Equipment",
+      category: "PPE Standard",
+      count: 1,
+      severity: "Medium",
+      description: "Worker detected without high-visibility safety vest.",
+      recommendation: "Issue and mandate high-visibility safety vests."
+    }
+  ];
+  const complianceViolationsCount = result?.compliance?.violations_count ?? complianceViolations.length;
+  const checkpoints = result?.compliance?.inspection_checkpoints ?? [
+    { checkpoint: "Head Protection (OSHA 29 CFR 1926.100)", status: "Non-Compliant", detail: "1 violation detected.", category: "PPE Standard" },
+    { checkpoint: "Hi-Vis Vest (OSHA 29 CFR 1926.28)", status: "Non-Compliant", detail: "1 violation detected.", category: "PPE Standard" },
+    { checkpoint: "Respiratory & Face Protection", status: "Compliant", detail: "No non-compliance detected.", category: "PPE Standard" },
+    { checkpoint: "Heavy Equipment Safety Clearance", status: "Warning", detail: "Machinery operating near personnel.", category: "Equipment Safety" },
+    { checkpoint: "Safety Cones Demarcation", status: "Compliant", detail: "Perimeter cones detected in view.", category: "Site Controls" }
+  ];
+  const categoryScores = result?.compliance?.category_scores ?? {
+    "OSHA Standards": 98,
+    "Building Codes": 95,
+    "Environmental Regulations": 94,
+    "Site Safety Rules": 91
+  };
+  const complianceRecommendations = result?.compliance?.recommendations ?? [
+    "Require mandatory hardhat use before entering active work zones.",
+    "Issue and mandate high-visibility safety vests for all personnel on deck and roadway zones.",
+    "Establish barricaded swing radius and assign dedicated ground spotters during machinery operation."
+  ];
+  const limitationNote = result?.compliance?.limitation_note ?? "Rule evaluation is constrained to visual hazards and PPE classes detected by the current YOLOv11 model.";
+
+  const insuranceRiskScore = result?.insurance?.insurance_risk_score ?? 38;
+  const insuranceRiskLevel = result?.insurance?.risk_level ?? "Medium";
+  const lossControlRating = result?.insurance?.loss_control_rating ?? "Grade B (Standard Controls)";
+  const premiumImpact = result?.insurance?.premium_impact ?? "Standard Underwriting Tier (+0% to +5%)";
+  const insuranceRiskFactors = result?.insurance?.risk_factors ?? [
+    { line: "Workers' Compensation", driver: "Head / Traumatic Brain Injury Exposure", severity: "High", impact: "Primary driver of severe worker compensation and indemnity claims." },
+    { line: "Commercial General Liability (CGL)", driver: "Heavy Machinery & Equipment Proximity", severity: "Medium", impact: "Potential third-party struck-by or vehicular property damage." },
+    { line: "Site Liability & EHS", driver: "Low Visibility Personnel", severity: "Medium", impact: "Workers without vests increase incident probability around equipment." }
+  ];
+  const lossControlRecommendations = result?.insurance?.loss_control_recommendations ?? [
+    "Enforce strict 100% hardhat and high-vis vest compliance at all zone entry turnstiles.",
+    "Implement designated machinery spotters and physical barricades around operating excavators.",
+    "Maintain logged pre-shift toolbox safety briefings to document proactive loss control.",
+    "Ensure prompt corrective action close-out for all computer-vision-flagged non-compliances."
+  ];
+  const insuranceDisclaimer = result?.insurance?.disclaimer ?? "Notice: This assessment is an AI-assisted risk analytics estimation generated for proactive site safety and loss control engineering purposes only. It does not constitute an official insurance policy underwriting decision, formal audit certification, or legally binding rate quotation.";
+
   // ── Nav ──────────────────────────────────────────────────────────────────
   const navItems = [
     { id: "site-risk",            label: "Site Risk Dashboard",    icon: ShieldAlert },
     { id: "safety-intelligence",  label: "Safety Intelligence",    icon: HardHat     },
+    { id: "compliance",           label: "Compliance Intelligence", icon: Scale       },
+    { id: "insurance",            label: "Insurance Risk",         icon: ShieldCheck },
+    { id: "compliance-report",    label: "Compliance Report",      icon: FileCheck   },
     { id: "incidents",            label: "Incident Reports",       icon: FileText    },
     { id: "analytics",            label: "Analytics & Trends",     icon: BarChart3   },
     { id: "zone-overview",        label: "Zone Overview",          icon: MapPin      },
@@ -233,6 +376,9 @@ export default function App() {
   const pageTitle = {
     "site-risk":           "Site Risk Monitoring & Hazard Detection",
     "safety-intelligence": "Safety Intelligence & Worker Protection",
+    "compliance":          "Compliance & Regulatory Intelligence",
+    "insurance":           "Insurance Risk Assessment & Underwriting",
+    "compliance-report":   "Compliance & Insurance Audit Report",
     "incidents":           "Incident Reports",
     "analytics":           "Analytics & Trends",
     "zone-overview":       "Zone Overview",
@@ -241,6 +387,9 @@ export default function App() {
   const pageDesc = {
     "site-risk":           "Live hazard surveillance, spatial risk scoring, and detection workflows",
     "safety-intelligence": "PPE compliance tracking, worker safety analytics, and automated alert dispatch",
+    "compliance":          "Rule-based regulatory validation against OSHA standards and site checkpoints",
+    "insurance":           "AI-assisted insurance risk scoring, liability factors, and loss-control analytics",
+    "compliance-report":   "Audit-ready documentation of violations, rule citations, and corrective plans",
     "incidents":           "Log of all recorded safety incidents with status and severity tracking",
     "analytics":           "Weekly risk trends, PPE compliance over time, and incident frequency",
     "zone-overview":       "All construction zones with live risk scores and hazard summaries",
@@ -297,6 +446,11 @@ export default function App() {
             {(activeTab === "site-risk") && (
               <button className="secondary-btn" onClick={() => fileInputRef.current?.click()}>
                 <UploadCloud size={14} /> <span>Upload Media</span>
+              </button>
+            )}
+            {(activeTab === "compliance-report") && (
+              <button className="secondary-btn" onClick={() => window.print()}>
+                <Printer size={14} /> <span>Print / Export</span>
               </button>
             )}
             <button className="gradient-btn" onClick={loadTelemetry}>
@@ -584,6 +738,448 @@ export default function App() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              MILESTONE 3 — COMPLIANCE INTELLIGENCE
+          ════════════════════════════════════════════════════════════════ */}
+          {activeTab === "compliance" && (
+            <>
+              {/* KPI row matching PDF Week 5-6 */}
+              <div className="metric-cards-row">
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Compliance Score</span>
+                    <div className="metric-icon-box icon-cyan"><Scale size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{complianceScore}%</span>
+                  </div>
+                  <div className={`metric-status ${complianceStatus === "Compliant" ? "text-green" : "text-orange"}`}>
+                    {complianceStatus}
+                  </div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Open Violations</span>
+                    <div className="metric-icon-box icon-pink"><AlertTriangle size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{complianceViolationsCount}</span>
+                    <span className="metric-sub">flagged</span>
+                  </div>
+                  <div className="metric-status text-red">OSHA rules triggered</div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Insurance Risk Score</span>
+                    <div className="metric-icon-box icon-amber"><ShieldCheck size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{insuranceRiskLevel}</span>
+                    <span className="metric-sub">{insuranceRiskScore}/100</span>
+                  </div>
+                  <div className="metric-status text-orange">Loss control active</div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Audit Readiness</span>
+                    <div className="metric-icon-box icon-emerald"><FileCheck size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{auditReadiness}%</span>
+                  </div>
+                  <div className="metric-status text-green">Inspection prepared</div>
+                </div>
+              </div>
+
+              {/* Two Column Layout */}
+              <div className="dashboard-columns">
+                {/* Left: Checkpoints & Limitation */}
+                <div className="card-panel">
+                  <div className="panel-header">
+                    <div>
+                      <h3><Scale size={16} /> Regulatory Checkpoints (OSHA 29 CFR 1926)</h3>
+                      <p>Rule-based validation of PPE and site hazard controls</p>
+                    </div>
+                    <span style={{ fontSize: "11px", color: "#06b6d4", fontWeight: 700 }}>● RULE VALIDATED</span>
+                  </div>
+
+                  <div className="checkpoints-list">
+                    {checkpoints.map((cp, idx) => (
+                      <div key={idx} className="checkpoint-item">
+                        <div className="checkpoint-info">
+                          <h5>{cp.checkpoint}</h5>
+                          <p>{cp.detail}</p>
+                        </div>
+                        <span className={`checkpoint-badge ${cp.status.toLowerCase().replace(" ", "-")}`}>
+                          {cp.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="ai-box" style={{ marginTop: 20 }}>
+                    <h4><Bot size={15} /> Compliance Agent</h4>
+                    <p>
+                      {complianceViolationsCount > 0
+                        ? `${complianceViolationsCount} regulatory violation(s) flagged against OSHA standards. Prescriptive corrective actions have been generated.`
+                        : "All visual safety standards satisfied for currently monitored personnel and equipment."}
+                    </p>
+                  </div>
+
+                  <div className="limitation-card">
+                    <Info size={20} color="#60a5fa" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <h5>Data &amp; Model Scope Notice</h5>
+                      <p>{limitationNote}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Category Breakdown & Violations Register */}
+                <div className="card-panel">
+                  <div className="panel-header">
+                    <div>
+                      <h3>Compliance Status by Category</h3>
+                      <p>Adherence across construction governance standards</p>
+                    </div>
+                  </div>
+
+                  <div className="ppe-list">
+                    {[
+                      { label: "OSHA Standards",              pct: categoryScores["OSHA Standards"] ?? 98,              fill: "fill-purple" },
+                      { label: "Building Safety Codes",        pct: categoryScores["Building Codes"] ?? 95,              fill: "fill-blue"   },
+                      { label: "Environmental Regulations",    pct: categoryScores["Environmental Regulations"] ?? 94,  fill: "fill-emerald"},
+                      { label: "Site & Insurance Work Rules",  pct: categoryScores["Site Safety Rules"] ?? 91,          fill: "fill-amber"  },
+                    ].map(({ label, pct, fill }) => (
+                      <div key={label} className="ppe-item">
+                        <div className="ppe-header">
+                          <span className="ppe-title">{label}</span>
+                          <span className="ppe-percentage">{pct}%</span>
+                        </div>
+                        <div className="progress-track-bg">
+                          <div className={`progress-bar-fill ${fill}`} style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ marginTop: 24 }}>
+                    <h4 style={{ fontSize: 13, color: "#fff", marginBottom: 12 }}>Active Violations Register</h4>
+                    {complianceViolations.length === 0 ? (
+                      <div style={{ padding: "16px", textAlign: "center", color: "#34d399", background: "rgba(16,185,129,0.06)", borderRadius: 8 }}>
+                        <CheckCircle2 size={24} style={{ margin: "0 auto 6px", display: "block" }} />
+                        <span>No regulatory violations currently detected.</span>
+                      </div>
+                    ) : (
+                      <div className="alerts-list">
+                        {complianceViolations.map((v, idx) => (
+                          <div key={idx} className="alert-item-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
+                              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                                <span className="rule-pill">{v.rule_id}</span>
+                                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>{v.standard}</span>
+                              </div>
+                              <span className={`alert-tag ${v.severity === "High" ? "tag-red" : "tag-yellow"}`}>
+                                {v.severity} Severity
+                              </span>
+                            </div>
+                            <h5 style={{ fontSize: "13px", color: "#fff", margin: "2px 0" }}>{v.title}</h5>
+                            <p style={{ fontSize: "12px", color: "var(--text-muted)" }}>{v.description}</p>
+                            <div style={{ fontSize: "11.5px", color: "#93c5fd", background: "rgba(59,130,246,0.08)", padding: "6px 10px", borderRadius: 6, width: "100%" }}>
+                              <strong>Directive: </strong>{v.recommendation}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              MILESTONE 3 — INSURANCE RISK ASSESSMENT
+          ════════════════════════════════════════════════════════════════ */}
+          {activeTab === "insurance" && (
+            <>
+              {/* Rating Banner */}
+              <div className="rating-banner-box">
+                <div>
+                  <h4>{lossControlRating}</h4>
+                  <span>Forecasted Underwriting Status: <b>{premiumImpact}</b></span>
+                </div>
+                <span className="rating-badge">{insuranceRiskLevel} Risk Exposure</span>
+              </div>
+
+              {/* KPI row */}
+              <div className="metric-cards-row">
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Insurance Risk Score</span>
+                    <div className="metric-icon-box icon-indigo"><ShieldCheck size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{insuranceRiskScore}</span>
+                    <span className="metric-sub">/100</span>
+                  </div>
+                  <div className={`metric-status ${insuranceRiskScore > 50 ? "text-red" : "text-green"}`}>
+                    {insuranceRiskLevel} Exposure
+                  </div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Workers' Comp Risk</span>
+                    <div className="metric-icon-box icon-pink"><Users size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{result?.insurance?.underwriting_profile?.workers_comp_exposure ?? "Elevated"}</span>
+                  </div>
+                  <div className="metric-status text-orange">PPE violation dependent</div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">CGL Exposure</span>
+                    <div className="metric-icon-box icon-amber"><Activity size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{result?.insurance?.underwriting_profile?.cgl_exposure ?? "Moderate"}</span>
+                  </div>
+                  <div className="metric-status text-blue">Equipment proximity</div>
+                </div>
+
+                <div className="metric-card">
+                  <div className="metric-top">
+                    <span className="metric-label">Supervision Index</span>
+                    <div className="metric-icon-box icon-emerald"><CheckCircle2 size={18} /></div>
+                  </div>
+                  <div className="metric-value-wrap">
+                    <span className="metric-val">{result?.insurance?.underwriting_profile?.site_supervision_index ?? `${ppeRate}%`}</span>
+                  </div>
+                  <div className="metric-status text-green">Underwriting baseline</div>
+                </div>
+              </div>
+
+              {/* Columns: Risk Factors + Loss Control Recommendations */}
+              <div className="dashboard-columns">
+                {/* Left: Liability Risk Factors */}
+                <div className="card-panel">
+                  <div className="panel-header">
+                    <div>
+                      <h3><ShieldCheck size={16} /> Underwriting Risk Drivers &amp; Claim Exposure</h3>
+                      <p>Insurance risk factors synthesized by Insurance Agent</p>
+                    </div>
+                  </div>
+
+                  <div className="factors-grid">
+                    {insuranceRiskFactors.map((f, idx) => (
+                      <div key={idx} className="factor-card">
+                        <div className="factor-header">
+                          <span className="factor-line">{f.line}</span>
+                          <span className={`alert-tag ${f.severity === "High" ? "tag-red" : f.severity === "Medium" ? "tag-yellow" : "tag-green"}`}>
+                            {f.severity}
+                          </span>
+                        </div>
+                        <h4 className="factor-driver">{f.driver}</h4>
+                        <p className="factor-impact">{f.impact}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="ai-box" style={{ marginTop: 20 }}>
+                    <h4><Bot size={15} /> Insurance Agent</h4>
+                    <p>
+                      Underwriting loss-control grade evaluated as <b>{lossControlRating}</b>.
+                      Addressing open hardhat and safety vest alerts mitigates primary Workers' Compensation loss exposure.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right: Loss Control Directives */}
+                <div className="card-panel">
+                  <div className="panel-header">
+                    <div>
+                      <h3>Loss-Control Recommendations</h3>
+                      <p>Recommended safety engineering actions for policyholders</p>
+                    </div>
+                  </div>
+
+                  <div className="recommendation-list" style={{ marginTop: 10 }}>
+                    {lossControlRecommendations.map((rec, idx) => (
+                      <div key={idx} className="recommendation-row">
+                        <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0, marginTop: 2 }} />
+                        <span>{rec}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ marginTop: 24, padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid var(--border-color)" }}>
+                    <h5 style={{ fontSize: "13px", color: "#fff", marginBottom: 8 }}>Underwriting Credit Checklist</h5>
+                    <ul style={{ paddingLeft: "18px", fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.8 }}>
+                      <li>Zero unmitigated Class-A head injury flags in 24h cycle</li>
+                      <li>Documented spotters for all active excavators and vehicles</li>
+                      <li>Turnstile PPE computer vision verification logged</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="disclaimer-banner">
+                <Info size={18} color="#fbbf24" style={{ flexShrink: 0, marginTop: 2 }} />
+                <p>{insuranceDisclaimer}</p>
+              </div>
+            </>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              MILESTONE 3 — COMPLIANCE & AUDIT REPORT
+          ════════════════════════════════════════════════════════════════ */}
+          {activeTab === "compliance-report" && (
+            <div className="report-document">
+              {/* Report Header */}
+              <div className="report-header-section">
+                <div className="report-title-area">
+                  <h2>BuildSure AI — Regulatory Compliance &amp; Insurance Audit Report</h2>
+                  <p>AI-Powered Construction Risk, Safety &amp; Governance Assessment</p>
+                </div>
+                <div className="report-meta-box">
+                  <strong>Report ID: REP-AUDIT-2026-M3</strong>
+                  <span>Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</span>
+                  <br />
+                  <span>Hudson Yards Phase 2 — North Gate Sector</span>
+                </div>
+              </div>
+
+              {/* Executive Summary */}
+              <div className="report-section">
+                <h3>Executive Risk &amp; Compliance Summary</h3>
+                <div className="modal-stat-row" style={{ marginTop: 12 }}>
+                  <div className="modal-stat">
+                    <span>Compliance Score</span>
+                    <strong style={{ color: complianceScore > 80 ? "#34d399" : "#fbbf24" }}>{complianceScore}%</strong>
+                  </div>
+                  <div className="modal-stat">
+                    <span>Audit Readiness</span>
+                    <strong style={{ color: "#34d399" }}>{auditReadiness}%</strong>
+                  </div>
+                  <div className="modal-stat">
+                    <span>Insurance Tier</span>
+                    <strong style={{ color: insuranceRiskScore > 50 ? "#f87171" : "#fbbf24" }}>{insuranceRiskLevel}</strong>
+                  </div>
+                  <div className="modal-stat">
+                    <span>Site Risk Score</span>
+                    <strong style={{ color: siteRiskScore > 50 ? "#f87171" : "#34d399" }}>{siteRiskScore}/100</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 1: Violations */}
+              <div className="report-section">
+                <h3>1. Documented Regulatory Violations (OSHA 1926)</h3>
+                {complianceViolations.length === 0 ? (
+                  <p style={{ fontSize: "12.5px", color: "#34d399" }}>No regulatory violations currently logged for this inspection window.</p>
+                ) : (
+                  <div className="incident-table-wrapper" style={{ marginTop: 10 }}>
+                    <table className="incident-table">
+                      <thead>
+                        <tr>
+                          <th>Rule ID</th>
+                          <th>Standard</th>
+                          <th>Violation</th>
+                          <th>Severity</th>
+                          <th>Prescribed Directive</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {complianceViolations.map((v, idx) => (
+                          <tr key={idx}>
+                            <td><span className="rule-pill">{v.rule_id}</span></td>
+                            <td style={{ color: "#fff", fontWeight: 600 }}>{v.standard}</td>
+                            <td>{v.title}</td>
+                            <td>
+                              <span className={`alert-tag ${v.severity === "High" ? "tag-red" : "tag-yellow"}`}>
+                                {v.severity}
+                              </span>
+                            </td>
+                            <td style={{ color: "var(--text-muted)", fontSize: "12px" }}>{v.recommendation}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Section 2: Checkpoints */}
+              <div className="report-section">
+                <h3>2. Regulatory Checkpoint Verification</h3>
+                <div className="checkpoints-list" style={{ marginTop: 10 }}>
+                  {checkpoints.map((cp, idx) => (
+                    <div key={idx} className="checkpoint-item">
+                      <div className="checkpoint-info">
+                        <h5>{cp.checkpoint}</h5>
+                        <p>{cp.detail}</p>
+                      </div>
+                      <span className={`checkpoint-badge ${cp.status.toLowerCase().replace(" ", "-")}`}>
+                        {cp.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 3: Insurance Assessment */}
+              <div className="report-section">
+                <h3>3. Insurance Underwriting &amp; Loss Control Profile</h3>
+                <div style={{ padding: "14px", background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid var(--border-color)", marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span>Loss Control Rating: <b style={{ color: "#fff" }}>{lossControlRating}</b></span>
+                    <span>Forecasted Premium Impact: <b style={{ color: "#a855f7" }}>{premiumImpact}</b></span>
+                  </div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                    Workers' Compensation Exposure: <b style={{ color: "#fff" }}>{result?.insurance?.underwriting_profile?.workers_comp_exposure ?? "Elevated"}</b> |
+                    Commercial General Liability: <b style={{ color: "#fff", marginLeft: 4 }}>{result?.insurance?.underwriting_profile?.cgl_exposure ?? "Moderate"}</b> |
+                    Site Supervision Index: <b style={{ color: "#fff", marginLeft: 4 }}>{result?.insurance?.underwriting_profile?.site_supervision_index ?? `${ppeRate}%`}</b>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Corrective Actions */}
+              <div className="report-section">
+                <h3>4. Prescriptive Corrective Directives</h3>
+                <div className="recommendation-list">
+                  {complianceRecommendations.map((rec, idx) => (
+                    <div key={idx} className="recommendation-row">
+                      <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span>{rec}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Disclaimers */}
+              <div className="disclaimer-banner" style={{ marginTop: 20 }}>
+                <Info size={18} color="#fbbf24" style={{ flexShrink: 0, marginTop: 2 }} />
+                <p>
+                  <b>Compliance &amp; Underwriting Notice:</b> {insuranceDisclaimer} {limitationNote}
+                </p>
+              </div>
+
+              {/* Print Action */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24, gap: 12 }}>
+                <button className="gradient-btn" onClick={() => window.print()}>
+                  <Printer size={15} /> Print / Export Audit Document
+                </button>
+              </div>
+            </div>
           )}
 
           {/* ════════════════════════════════════════════════════════════════

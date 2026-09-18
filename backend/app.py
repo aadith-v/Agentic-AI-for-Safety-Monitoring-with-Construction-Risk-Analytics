@@ -4,6 +4,9 @@ from werkzeug.utils import secure_filename
 from detector import detect_hazards
 from risk_engine import calculate_risk
 from safety_agent import analyze_safety
+from compliance_agent import evaluate_compliance
+from insurance_agent import evaluate_insurance_risk
+from datetime import datetime
 
 import os
 import cv2
@@ -13,11 +16,23 @@ app = Flask(__name__)
 CORS(app)
 
 # -----------------------------
-# FOLDERS
+# FOLDERS & STATE
 # -----------------------------
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# In-memory store for the latest analyzed telemetry state
+latest_audit_state = {
+    "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "source_type": "demo",
+    "project_name": "Hudson Yards Phase 2 - Commercial High-Rise",
+    "detections": [],
+    "risk": {},
+    "safety": {},
+    "compliance": {},
+    "insurance": {}
+}
 
 
 # -----------------------------
@@ -29,13 +44,19 @@ def health():
     return jsonify({
         "status": "BuildSure AI API is running",
         "agent_network": "Active",
-        "agents": ["Site Risk Agent", "Safety Agent", "Compliance Agent", "Risk Intelligence Engine"]
+        "agents": [
+            "Site Risk Agent",
+            "Safety Agent",
+            "Compliance Agent",
+            "Insurance Agent",
+            "Risk Intelligence Engine"
+        ]
     })
 
 
 @app.route("/api/demo-telemetry", methods=["GET"])
 def demo_telemetry():
-    """Returns sample pre-computed multi-agent telemetry for instant live preview."""
+    """Returns pre-computed multi-agent telemetry for instant live preview."""
     sample_detections = [
         {"class": "NO-Hardhat", "confidence": 0.942, "bbox": [180, 84, 260, 210], "frame": 12, "time_seconds": 0.48, "zone": "Zone A — High Rise Deck"},
         {"class": "Person", "confidence": 0.965, "bbox": [170, 80, 310, 480], "frame": 12, "time_seconds": 0.48, "zone": "Zone A — High Rise Deck"},
@@ -49,6 +70,21 @@ def demo_telemetry():
     ]
     risk = calculate_risk(sample_detections)
     safety = analyze_safety(sample_detections)
+    compliance = evaluate_compliance(sample_detections, safety, risk)
+    insurance = evaluate_insurance_risk(sample_detections, safety, risk, compliance)
+
+    global latest_audit_state
+    latest_audit_state = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "source_type": "demo",
+        "project_name": "Hudson Yards Phase 2 - Commercial High-Rise",
+        "detections": sample_detections,
+        "risk": risk,
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
+    }
+
     return jsonify({
         "success": True,
         "type": "demo",
@@ -60,7 +96,9 @@ def demo_telemetry():
         },
         "detections": sample_detections,
         "risk": risk,
-        "safety": safety
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
     })
 
 
@@ -101,12 +139,33 @@ def analyze_image():
     # Safety calculation
     safety = analyze_safety(detections)
 
+    # Compliance calculation (Milestone 3)
+    compliance = evaluate_compliance(detections, safety, risk)
+
+    # Insurance calculation (Milestone 3)
+    insurance = evaluate_insurance_risk(detections, safety, risk, compliance)
+
+    global latest_audit_state
+    latest_audit_state = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "source_type": "image",
+        "source_name": filename,
+        "project_name": "Hudson Yards Phase 2 - Commercial High-Rise",
+        "detections": detections,
+        "risk": risk,
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
+    }
+
     return jsonify({
         "success": True,
         "type": "image",
         "detections": detections,
         "risk": risk,
-        "safety": safety
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
     })
 
 
@@ -227,12 +286,28 @@ def analyze_video():
     # Calculate safety metrics
     safety = analyze_safety(all_detections)
 
+    # Calculate compliance metrics (Milestone 3)
+    compliance = evaluate_compliance(all_detections, safety, risk)
+
+    # Calculate insurance risk metrics (Milestone 3)
+    insurance = evaluate_insurance_risk(all_detections, safety, risk, compliance)
+
+    global latest_audit_state
+    latest_audit_state = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "source_type": "video",
+        "source_name": filename,
+        "project_name": "Hudson Yards Phase 2 - Commercial High-Rise",
+        "detections": all_detections,
+        "risk": risk,
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
+    }
+
     return jsonify({
-
         "success": True,
-
         "type": "video",
-
         "video": {
             "filename": filename,
             "total_frames": total_frames,
@@ -242,11 +317,62 @@ def analyze_video():
                 2
             )
         },
-
         "detections": all_detections,
-
         "risk": risk,
-        "safety": safety
+        "safety": safety,
+        "compliance": compliance,
+        "insurance": insurance
+    })
+
+
+# -----------------------------
+# COMPLIANCE & INSURANCE REPORT
+# -----------------------------
+
+@app.route("/api/compliance/report", methods=["GET"])
+def get_compliance_report():
+    """Returns a structured audit and compliance report from the latest analysis session."""
+    global latest_audit_state
+
+    # Ensure state is populated if demo hasn't been hit yet
+    if not latest_audit_state.get("risk"):
+        demo_telemetry()
+
+    report = {
+        "report_id": f"REP-AUDIT-{datetime.now().strftime('%Y%m%d-%H%M')}",
+        "generated_at": latest_audit_state.get("generated_at", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        "project": {
+            "name": latest_audit_state.get("project_name", "Hudson Yards Phase 2 - Commercial High-Rise"),
+            "location": "North Sector, Gate 4",
+            "inspector_system": "BuildSure AI Multi-Agent Network v3.0"
+        },
+        "executive_summary": {
+            "compliance_score": latest_audit_state["compliance"].get("compliance_score", 96),
+            "compliance_status": latest_audit_state["compliance"].get("compliance_status", "Compliant"),
+            "audit_readiness": latest_audit_state["compliance"].get("audit_readiness", 92),
+            "insurance_risk_level": latest_audit_state["insurance"].get("risk_level", "Medium"),
+            "insurance_risk_score": latest_audit_state["insurance"].get("insurance_risk_score", 38),
+            "site_risk_score": latest_audit_state["risk"].get("site_risk_score", 72),
+            "ppe_compliance_rate": latest_audit_state["safety"].get("ppe_compliance_rate", 92),
+            "active_violations": latest_audit_state["compliance"].get("violations_count", 0)
+        },
+        "regulatory_findings": latest_audit_state["compliance"].get("violations", []),
+        "inspection_checkpoints": latest_audit_state["compliance"].get("inspection_checkpoints", []),
+        "category_scores": latest_audit_state["compliance"].get("category_scores", {}),
+        "insurance_assessment": {
+            "risk_level": latest_audit_state["insurance"].get("risk_level", "Medium"),
+            "loss_control_rating": latest_audit_state["insurance"].get("loss_control_rating", "Grade B"),
+            "premium_impact": latest_audit_state["insurance"].get("premium_impact", "Standard"),
+            "risk_factors": latest_audit_state["insurance"].get("risk_factors", []),
+            "loss_control_recommendations": latest_audit_state["insurance"].get("loss_control_recommendations", []),
+            "disclaimer": latest_audit_state["insurance"].get("disclaimer", "")
+        },
+        "corrective_recommendations": latest_audit_state["compliance"].get("recommendations", [])
+    }
+
+    return jsonify({
+        "success": True,
+        "report": report
     })
 
 

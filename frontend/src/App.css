@@ -998,3 +998,312 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* --------------------------------------------------------------------------
+   Milestone 3: Compliance & Insurance Intelligence Styles
+   -------------------------------------------------------------------------- */
+.icon-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.icon-indigo {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.checkpoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.checkpoint-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.checkpoint-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkpoint-info h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.checkpoint-info p {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.checkpoint-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.checkpoint-badge.compliant {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.checkpoint-badge.non-compliant {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.checkpoint-badge.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.checkpoint-badge.notice {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.rule-pill {
+  font-family: monospace;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  border-radius: 4px;
+}
+
+.limitation-card {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.limitation-card h5 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #93c5fd;
+  margin-bottom: 2px;
+}
+
+.limitation-card p {
+  font-size: 11.5px;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.factors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.factor-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.factor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.factor-line {
+  font-size: 12px;
+  font-weight: 700;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.factor-driver {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.factor-impact {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.disclaimer-banner {
+  padding: 14px 18px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.disclaimer-banner p {
+  font-size: 11.5px;
+  color: #fde68a;
+  line-height: 1.5;
+}
+
+.rating-banner-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.08) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.rating-banner-box h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rating-banner-box span {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.rating-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--grad-primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.report-document {
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.report-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.report-title-area h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.report-title-area p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.report-meta-box {
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.report-meta-box strong {
+  color: #fff;
+  display: block;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.report-section {
+  margin-bottom: 26px;
+}
+
+.report-section h3 {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommendation-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border-left: 3px solid #6366f1;
+  font-size: 12.5px;
+  color: #e2e8f0;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .sidebar, .topbar, .topbar-actions, button {
+    display: none !important;
+  }
+  .main-content {
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  .report-document {
+    border: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+  .report-title-area h2, .report-section h3, .factor-driver {
+    color: #000 !important;
+  }
+}
