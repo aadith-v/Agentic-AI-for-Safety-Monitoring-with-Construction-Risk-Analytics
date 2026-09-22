@@ -115,3 +115,9 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
+
+@media print {
+  body::before {
+    display: none !important;
+  }
+}
