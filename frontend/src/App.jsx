@@ -502,7 +502,7 @@ export default function App() {
   ];
 
   const pageTitle = {
-    "command-center":      "Construction Risk Command Center (Week 7–8)",
+    "command-center":      "",
     "site-risk":           "Site Risk Monitoring & Hazard Detection",
     "safety-intelligence": "Safety Intelligence & Worker Protection",
     "compliance":          "Compliance & Regulatory Intelligence",
@@ -514,7 +514,7 @@ export default function App() {
   }[activeTab];
 
   const pageDesc = {
-    "command-center":      "Executive dashboards, agent collaboration monitoring, and predictive risk intelligence engine",
+    "command-center":      "",
     "site-risk":           "Live hazard surveillance, spatial risk scoring, and detection workflows",
     "safety-intelligence": "PPE compliance tracking, worker safety analytics, and automated alert dispatch",
     "compliance":          "Rule-based regulatory validation against OSHA standards and site checkpoints",
@@ -568,8 +568,8 @@ export default function App() {
         {/* Topbar */}
         <header className="topbar">
           <div className="topbar-title-block">
-            <h1>{pageTitle}</h1>
-            <p>{pageDesc}</p>
+            {pageTitle && <h1>{pageTitle}</h1>}
+            {pageDesc && <p>{pageDesc}</p>}
           </div>
           <div className="topbar-actions">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="video/*,image/*" style={{ display: "none" }} />
@@ -600,8 +600,8 @@ export default function App() {
               {/* Command Center Enterprise Header */}
               <div className="command-center-header">
                 <div className="command-center-title">
-                  <h2><Activity size={22} color="#10b981" /> Construction Risk Command Center</h2>
-                  <p>Enterprise multi-agent risk intelligence, predictive incident forecasting &amp; autonomous governance</p>
+                  <h2><Activity size={22} color="#10b981" /> Executive Command Center</h2>
+                  <p>Multi-agent risk telemetry &amp; live governance</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                   <div className="orchestration-badge-pill">
@@ -620,7 +620,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* KPI row matching PDF Week 7-8 Screenshot */}
+              {/* KPI row */}
               <div className="metric-cards-row">
                 <div className="metric-card">
                   <div className="metric-top">
@@ -631,7 +631,7 @@ export default function App() {
                     <span className="metric-val">{result?.risk_intelligence?.executive_kpis?.project_risk_score ?? 82}</span>
                     <span className="metric-sub">/100</span>
                   </div>
-                  <div className="metric-status text-green">Optimal Control — Multi-Factor</div>
+                  <div className="metric-status text-green">Optimal Control</div>
                 </div>
 
                 <div className="metric-card">
@@ -642,7 +642,7 @@ export default function App() {
                   <div className="metric-value-wrap">
                     <span className="metric-val">{result?.risk_intelligence?.executive_kpis?.incidents_prevented ?? 67}</span>
                   </div>
-                  <div className="metric-status text-blue">YTD Autonomous Preemptions</div>
+                  <div className="metric-status text-blue">Autonomous Preemptions</div>
                 </div>
 
                 <div className="metric-card">
@@ -653,7 +653,7 @@ export default function App() {
                   <div className="metric-value-wrap">
                     <span className="metric-val">+{result?.risk_intelligence?.executive_kpis?.compliance_improvement_pct ?? 15}%</span>
                   </div>
-                  <div className="metric-status text-green">Month-over-month gain</div>
+                  <div className="metric-status text-green">Month-over-Month</div>
                 </div>
 
                 <div className="metric-card">
@@ -664,16 +664,16 @@ export default function App() {
                   <div className="metric-value-wrap">
                     <span className="metric-val">{result?.risk_intelligence?.executive_kpis?.estimated_cost_savings ?? "$2.4M"}</span>
                   </div>
-                  <div className="metric-status text-orange">Claims &amp; Underwriting Credits</div>
+                  <div className="metric-status text-orange">Underwriting Credits</div>
                 </div>
               </div>
 
-              {/* Agent Performance Overview Panel (Matching Week 7-8 PDF) */}
+              {/* Agent Performance Overview Panel */}
               <div className="card-panel" style={{ marginBottom: 20 }}>
                 <div className="panel-header">
                   <div>
-                    <h3><Cpu size={16} /> Agent Performance Overview &amp; Health</h3>
-                    <p>Real-time autonomous metrics across specialized safety, risk, compliance &amp; underwriting agents</p>
+                    <h3><Cpu size={16} /> Agent Fleet Health &amp; Performance</h3>
+                    <p>Real-time autonomous metrics across specialized agents</p>
                   </div>
                   <span style={{ fontSize: "11.5px", color: "var(--text-muted)" }}>
                     Pipeline ID: <b style={{ color: "#fff" }}>{result?.orchestration?.orchestration_id || "ORCH-2026-LIVE"}</b>
@@ -764,8 +764,8 @@ export default function App() {
                 <div className="card-panel">
                   <div className="panel-header">
                     <div>
-                      <h3><AlertTriangle size={16} /> Construction Risk Intelligence Engine — Incident Forecast</h3>
-                      <p>Predictive modeling of incident probabilities based on real-time site hazards</p>
+                      <h3><AlertTriangle size={16} /> Predictive Incident Forecast</h3>
+                      <p>Probability modeling based on active hazard telemetry</p>
                     </div>
                   </div>
 
@@ -778,9 +778,9 @@ export default function App() {
                             {item.probability}% ({item.impact_window})
                           </span>
                         </div>
-                        <p className="forecast-factors"><b>Observed Condition:</b> {item.contributing_factors}</p>
+                        <p className="forecast-factors"><b>Condition:</b> {item.contributing_factors}</p>
                         <div className="forecast-mitigation">
-                          <b>Operational Action:</b> {item.mitigation}
+                          <b>Action:</b> {item.mitigation}
                         </div>
                       </div>
                     ))}
@@ -792,7 +792,7 @@ export default function App() {
                   <div className="panel-header">
                     <div>
                       <h3><TrendingUp size={16} /> Recurring Site Risk Patterns</h3>
-                      <p>Pattern recognition detected across shifts, zones, and work phases</p>
+                      <p>Pattern recognition detected across shifts and zones</p>
                     </div>
                   </div>
 
@@ -837,8 +837,8 @@ export default function App() {
               <div className="card-panel" style={{ marginBottom: 24 }}>
                 <div className="panel-header">
                   <div>
-                    <h3><Bot size={16} /> Agent Collaboration &amp; Orchestration Trace</h3>
-                    <p>Live execution flow, inter-agent data exchange, and synchronization latencies</p>
+                    <h3><Bot size={16} /> Agent Collaboration Trace</h3>
+                    <p>Live execution flow and synchronization latencies</p>
                   </div>
                 </div>
 
